@@ -23,14 +23,26 @@ export default function AdminPanel() {
   const loadData = async () => {
     try {
       if (activeTab === 'dashboard') {
-        const [p, c, o, u] = await Promise.all([getProducts(), getCategories(), getAllOrders(), getAllUsers()]);
-        setProducts(p); setCategories(c); setOrders(o); setUsers(u);
+        const [p, c, o, u] = await Promise.all([
+          getProducts().catch(() => []), 
+          getCategories().catch(() => []), 
+          getAllOrders().catch(() => []), 
+          getAllUsers().catch(() => [])
+        ]);
+        setProducts(Array.isArray(p) ? p : []); 
+        setCategories(Array.isArray(c) ? c : []); 
+        setOrders(Array.isArray(o) ? o : []); 
+        setUsers(Array.isArray(u) ? u : []);
       } else if (activeTab === 'products') {
-        const [p, c] = await Promise.all([getProducts(), getCategories()]);
-        setProducts(p); setCategories(c);
+        const [p, c] = await Promise.all([
+          getProducts().catch(() => []), 
+          getCategories().catch(() => [])
+        ]);
+        setProducts(Array.isArray(p) ? p : []); 
+        setCategories(Array.isArray(c) ? c : []);
       } else if (activeTab === 'orders') {
-        const o = await getAllOrders();
-        setOrders(o);
+        const o = await getAllOrders().catch(() => []);
+        setOrders(Array.isArray(o) ? o : []);
       }
     } catch (e) {
       console.error('Failed to load admin data', e);

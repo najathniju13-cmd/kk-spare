@@ -12,7 +12,10 @@ export default function BikeModelSelector({ onFindParts, onReset }) {
   const YEARS = ['2015','2016','2017','2018','2019','2020','2021','2022','2023','2024'];
 
   useEffect(() => {
-    fetch(`${BASE}/brands`).then(r => r.json()).then(data => setBrands(data.map(b => b.name)));
+    fetch(`${BASE}/brands`)
+      .then(r => r.ok ? r.json() : [])
+      .then(data => setBrands(Array.isArray(data) ? data.map(b => b.name) : []))
+      .catch(() => setBrands([]));
   }, []);
 
   const handleBrandChange = (e) => {
@@ -22,8 +25,9 @@ export default function BikeModelSelector({ onFindParts, onReset }) {
     setYear('');
     if (selected) {
       fetch(`${BASE}/brands/${selected}/models`)
-        .then(r => r.json())
-        .then(data => setModels(data.map(m => m.name)));
+        .then(r => r.ok ? r.json() : [])
+        .then(data => setModels(Array.isArray(data) ? data.map(m => m.name) : []))
+        .catch(() => setModels([]));
     } else {
       setModels([]);
     }

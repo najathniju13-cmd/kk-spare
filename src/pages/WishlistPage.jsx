@@ -11,9 +11,9 @@ export default function WishlistPage({ user, onAddToCart, onViewDetails, wishlis
       setLoading(true);
       const token = localStorage.getItem('token');
       fetch(`${BASE}/wishlist`, { headers: { 'Authorization': `Bearer ${token}` } })
-        .then(res => res.json())
-        .then(data => { setProducts(data); setLoading(false); })
-        .catch(err => { console.error(err); setLoading(false); });
+        .then(res => res.ok ? res.json() : [])
+        .then(data => { setProducts(Array.isArray(data) ? data : []); setLoading(false); })
+        .catch(err => { console.error(err); setProducts([]); setLoading(false); });
     }
   }, [user, wishlistItemIds]);
 

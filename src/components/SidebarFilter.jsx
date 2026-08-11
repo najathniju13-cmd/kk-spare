@@ -15,8 +15,15 @@ export default function SidebarFilter({
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    fetch(`${BASE}/categories`).then(r => r.json()).then(setCategories);
-    fetch(`${BASE}/brands`).then(r => r.json()).then(data => setBrands(data.map(b => b.name)));
+    fetch(`${BASE}/categories`)
+      .then(r => r.ok ? r.json() : [])
+      .then(data => setCategories(Array.isArray(data) ? data : []))
+      .catch(() => setCategories([]));
+
+    fetch(`${BASE}/brands`)
+      .then(r => r.ok ? r.json() : [])
+      .then(data => setBrands(Array.isArray(data) ? data.map(b => b.name) : []))
+      .catch(() => setBrands([]));
   }, []);
 
   return (
@@ -35,7 +42,7 @@ export default function SidebarFilter({
           >
             <span>All Parts</span>
           </li>
-          {categories.map(cat => (
+          {Array.isArray(categories) && categories.map(cat => (
             <li 
               key={cat.name} 
               className={`filter-item ${selectedCategory === cat.name ? 'active' : ''}`}
@@ -57,7 +64,7 @@ export default function SidebarFilter({
           >
             <span>All Brands</span>
           </li>
-          {brands.map(brand => (
+          {Array.isArray(brands) && brands.map(brand => (
             <li 
               key={brand} 
               className={`filter-item ${selectedBrandFilter === brand ? 'active' : ''}`}
