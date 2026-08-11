@@ -39,7 +39,7 @@ router.get('/', async (req, res) => {
     });
     
     res.json(products);
-  } catch (err) { console.error(err); res.status(500).json({ message: 'Server error' }); }
+  } catch (err) { console.error(err); res.status(500).json({ message: 'Server error', error: err.message }); }
 });
 
 router.get('/:id', async (req, res) => {
@@ -67,7 +67,7 @@ router.get('/:id', async (req, res) => {
     product.total_reviews = reviews.length;
 
     res.json(product);
-  } catch (err) { console.error(err); res.status(500).json({ message: 'Server error' }); }
+  } catch (err) { console.error(err); res.status(500).json({ message: 'Server error', error: err.message }); }
 });
 
 router.post('/:id/reviews', authMiddleware, async (req, res) => {
@@ -78,7 +78,7 @@ router.post('/:id/reviews', authMiddleware, async (req, res) => {
       [req.user.id, req.params.id, rating, comment, rating, comment]
     );
     res.json({ message: 'Review saved' });
-  } catch (err) { console.error(err); res.status(500).json({ message: 'Server error' }); }
+  } catch (err) { console.error(err); res.status(500).json({ message: 'Server error', error: err.message }); }
 });
 
 router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
@@ -86,7 +86,7 @@ router.post('/', authMiddleware, adminMiddleware, async (req, res) => {
     const { name, price, category_id, badge, image, type, stock, warranty } = req.body;
     const [result] = await db.execute(`INSERT INTO products (name, price, category_id, badge, image, type, stock, warranty) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, [name, price, category_id, badge || '', image, type, stock || 0, warranty || 'N/A']);
     res.status(201).json({ message: 'Product created', id: result.insertId });
-  } catch (err) { console.error(err); res.status(500).json({ message: 'Server error' }); }
+  } catch (err) { console.error(err); res.status(500).json({ message: 'Server error', error: err.message }); }
 });
 
 router.put('/:id', authMiddleware, adminMiddleware, async (req, res) => {
@@ -94,14 +94,14 @@ router.put('/:id', authMiddleware, adminMiddleware, async (req, res) => {
     const { name, price, category_id, badge, image, type, stock, warranty } = req.body;
     await db.execute(`UPDATE products SET name=?, price=?, category_id=?, badge=?, image=?, type=?, stock=?, warranty=? WHERE id=?`, [name, price, category_id, badge || '', image, type, stock, warranty, req.params.id]);
     res.json({ message: 'Product updated' });
-  } catch (err) { console.error(err); res.status(500).json({ message: 'Server error' }); }
+  } catch (err) { console.error(err); res.status(500).json({ message: 'Server error', error: err.message }); }
 });
 
 router.delete('/:id', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     await db.execute('DELETE FROM products WHERE id = ?', [req.params.id]);
     res.json({ message: 'Product deleted' });
-  } catch (err) { console.error(err); res.status(500).json({ message: 'Server error' }); }
+  } catch (err) { console.error(err); res.status(500).json({ message: 'Server error', error: err.message }); }
 });
 
 router.post('/:id/compatibility', authMiddleware, adminMiddleware, async (req, res) => {
@@ -109,7 +109,7 @@ router.post('/:id/compatibility', authMiddleware, adminMiddleware, async (req, r
     const { brand_id, model_id, year_id } = req.body;
     await db.execute('INSERT IGNORE INTO product_compatibility (product_id, brand_id, model_id, year_id) VALUES (?, ?, ?, ?)', [req.params.id, brand_id, model_id, year_id]);
     res.json({ message: 'Compatibility added' });
-  } catch (err) { console.error(err); res.status(500).json({ message: 'Server error' }); }
+  } catch (err) { console.error(err); res.status(500).json({ message: 'Server error', error: err.message }); }
 });
 
 module.exports = router;
